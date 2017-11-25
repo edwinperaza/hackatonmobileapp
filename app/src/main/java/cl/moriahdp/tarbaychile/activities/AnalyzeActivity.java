@@ -1,35 +1,3 @@
-//
-// Copyright (c) Microsoft. All rights reserved.
-// Licensed under the MIT license.
-//
-// Microsoft Cognitive Services (formerly Project Oxford): https://www.microsoft.com/cognitive-services
-//
-// Microsoft Cognitive Services (formerly Project Oxford) GitHub:
-// https://github.com/Microsoft/Cognitive-Vision-Android
-//
-// Copyright (c) Microsoft Corporation
-// All rights reserved.
-//
-// MIT License:
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED ""AS IS"", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
 package cl.moriahdp.tarbaychile.activities;
 
 import android.Manifest;
@@ -41,8 +9,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
+import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -55,15 +24,18 @@ import android.widget.ImageView;
 import com.google.gson.Gson;
 import com.microsoft.projectoxford.vision.VisionServiceClient;
 import com.microsoft.projectoxford.vision.contract.AnalysisResult;
+import com.microsoft.projectoxford.vision.contract.Caption;
+import com.microsoft.projectoxford.vision.contract.Tag;
 import com.microsoft.projectoxford.vision.rest.VisionServiceException;
-//import com.microsoft.projectoxford.visionsample.helper.ImageHelper;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import cl.moriahdp.tarbaychile.R;
-import cl.moriahdp.tarbaychile.fragments.CameraFragment;
+import cl.moriahdp.tarbaychile.models.AnalysisImageResult;
 import cl.moriahdp.tarbaychile.utils.Constant;
 import cl.moriahdp.tarbaychile.utils.ImageHelper;
 import cl.moriahdp.tarbaychile.utils.SelectImageActivity;
@@ -99,18 +71,18 @@ public class AnalyzeActivity extends ActionBarActivity {
     private View mRootView;
     private static final String TAG = AnalyzeActivity.class.getSimpleName();
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_analyze);
 
-        if (client==null){
+        if (client == null) {
             client = new VisionServiceRestClient2(getString(R.string.subscription_key));
         }
 
-        mButtonSelectImage = (Button)findViewById(R.id.buttonSelectImage);
-        mEditText = (EditText)findViewById(R.id.editTextResult);
-
+        mEditText = (EditText) findViewById(R.id.editTextResult);
+        mCameraImage = (ImageView) findViewById(R.id.selectedImage);
         if (checkPermission(getApplicationContext())) {
             selectImage();
         } else {
@@ -124,6 +96,25 @@ public class AnalyzeActivity extends ActionBarActivity {
                         Constant.REQUEST_PERMISSION_CODE);
             }
         }
+
+        mCameraImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkPermission(getApplicationContext())) {
+                    selectImage();
+                } else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        requestPermissions(
+                                new String[]{
+                                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                                        Manifest.permission.CAMERA
+                                },
+                                Constant.REQUEST_PERMISSION_CODE);
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -149,64 +140,84 @@ public class AnalyzeActivity extends ActionBarActivity {
     }
 
     public void doAnalyze() {
-        mButtonSelectImage.setEnabled(false);
-        mEditText.setText("Analyzing...");
-
+        mCameraImage.setClickable(false);
         try {
             new doRequest().execute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             mEditText.setText("Error encountered. Exception is: " + e.toString());
         }
     }
 
-    // Called when the "Select Image" button is clicked.
-    public void selectImage(View view) {
-        mEditText.setText("");
-
-        Intent intent;
-        intent = new Intent(AnalyzeActivity.this, SelectImageActivity.class);
-        startActivityForResult(intent, REQUEST_SELECT_IMAGE);
-    }
-
     public void selectImage() {
         mEditText.setText("");
-
         Intent intent;
         intent = new Intent(AnalyzeActivity.this, SelectImageActivity.class);
         startActivityForResult(intent, REQUEST_SELECT_IMAGE);
     }
 
-    // Called when image selection is done.
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("AnalyzeActivity", "onActivityResult");
-        switch (requestCode) {
-            case REQUEST_SELECT_IMAGE:
-                if(resultCode == RESULT_OK) {
-                    // If image is selected successfully, set the image URI and bitmap.
-                    mImageUri = data.getData();
+    /**
+     * Check device version and launch camera depends on it.
+     *
+     * @param action      action to be implemented
+     * @param requestCode code to know who launch the activity
+     * @param errorToast  message to be shown if an issue occur.
+     */
+    private void dispatchMedia(String action, int requestCode, int errorToast) {
+        // Create Intent to dispatch media and return control to the calling application
+        Intent intent = new Intent(action);
 
-                    mBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(
-                            mImageUri, getContentResolver());
-                    if (mBitmap != null) {
-                        // Show the image on screen.
-                        ImageView imageView = (ImageView) findViewById(R.id.selectedImage);
-                        imageView.setImageBitmap(mBitmap);
+        // Create the File where the photo should go
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-                        // Add detection log.
-                        Log.d("AnalyzeActivity", "Image: " + mImageUri + " resized to " + mBitmap.getWidth()
-                                + "x" + mBitmap.getHeight());
+            File photoFile = null;
+            try {
+                photoFile = ImageHelper.createImageFile(this);
+                mCurrentPhotoPath = photoFile.getAbsolutePath();
+                mCurrentFileName = photoFile.getName();
+            } catch (IOException ex) {
+                //Crashlytics.logException(ex);
+                //Crashlytics.log("Error occurred while creating the File");
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri fileUriCreated = FileProvider.getUriForFile(
+                        getApplicationContext(),
+                        "cl.moriahdp.tarbaychile.fileprovider",
+                        photoFile);
 
-                        doAnalyze();
-                    }
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUriCreated);
+            }
+
+        } else {
+            mCurrentFileName = ImageHelper.getFileName();
+
+            Uri fileUriCreated = ImageHelper.getExternalFileUri(
+                    this,
+                    mCurrentFileName,
+                    TAG);
+            try {
+                if (fileUriCreated != null) {
+                    mCurrentPhotoPath = fileUriCreated.getPath();
                 }
-                break;
-            default:
-                break;
+            } catch (Exception ex) {
+                //Crashlytics.logException(ex);
+                //Crashlytics.log("Error occurred while getting path");
+            }
+
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUriCreated);
+        }
+
+        // If you call startActivityForResult() using an intent that no app can handle, your app
+        // will crash. So as long as the result is not null, it's safe to use the intent.
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            // Start the dispatch media intent
+            startActivityForResult(intent, requestCode);
+        } else {
+            //Crashlytics.log("No app can handle the media");
+            // No app can handle the media
+            //showLongToast(errorToast);
         }
     }
-
 
     private String process() throws VisionServiceException, IOException {
         Gson gson = new Gson();
@@ -258,42 +269,30 @@ public class AnalyzeActivity extends ActionBarActivity {
                 this.e = null;
             } else {
                 Gson gson = new Gson();
-                AnalysisResult result = gson.fromJson(data, AnalysisResult.class);
+                AnalysisImageResult result = gson.fromJson(data, AnalysisImageResult.class);
+                if (result != null) {
+                    if ((result.tags != null) && (result.tags.size() > 0)) {
+                        List<Tag> tags = result.tags;
+                        mEditText.append("Tags:");
+                        for (Tag tag : tags) {
+                            if (tag.confidence > 0.90) {
+                                mEditText.append(" " + tag.name + ",");
+                            }
+                        }
+                    }
 
-                //mEditText.append("Image format: " + result.metadata.format + "\n");
-                //mEditText.append("Image width: " + result.metadata.width + ", height:" + result.metadata.height + "\n");
-                //mEditText.append("Clip Art Type: " + result.imageType.clipArtType + "\n");
-                //mEditText.append("Line Drawing Type: " + result.imageType.lineDrawingType + "\n");
-                //mEditText.append("Is Adult Content:" + result.adult.isAdultContent + "\n");
-                //mEditText.append("Adult score:" + result.adult.adultScore + "\n");
-                //mEditText.append("Is Racy Content:" + result.adult.isRacyContent + "\n");
-                //mEditText.append("Racy score:" + result.adult.racyScore + "\n\n") ;
+                    if ((result.description.captions != null) && (result.description.captions.size() > 0)) {
+                        for (Caption caption : result.description.captions) {
+                            if (caption.confidence > 0.90) {
+                                mEditText.append("\\nDescription:" + caption.text);
+                                break;
+                            }
+                        }
+                    }
+                }
 
-//                for (Category category: result.categories) {
-//                    mEditText.append("Category: " + category.name + ", score: " + category.score + "\n");
-//                }
-
-//                mEditText.append("\n");
-//                int faceCount = 0;
-//                for (Face face: result.faces) {
-//                    faceCount++;
-//                    mEditText.append("face " + faceCount + ", gender:" + face.gender + "(score: " + face.genderScore + "), age: " + + face.age + "\n");
-//                    mEditText.append("    left: " + face.faceRectangle.left +  ",  top: " + face.faceRectangle.top + ", width: " + face.faceRectangle.width + "  height: " + face.faceRectangle.height + "\n" );
-//                }
-//                if (faceCount == 0) {
-//                    mEditText.append("No face is detected");
-//                }
-//                mEditText.append("\n");
-//
-//                mEditText.append("\nDominant Color Foreground :" + result.color.dominantColorForeground + "\n");
-//                mEditText.append("Dominant Color Background :" + result.color.dominantColorBackground + "\n");
-
-                mEditText.append("\n--- Raw Data ---\n\n");
-                mEditText.append(data);
-                mEditText.setSelection(0);
             }
-
-            mButtonSelectImage.setEnabled(true);
+            mCameraImage.setClickable(true);
         }
     }
 
@@ -309,19 +308,50 @@ public class AnalyzeActivity extends ActionBarActivity {
                 result2 == PackageManager.PERMISSION_GRANTED;
     }
 
+    // Called when image selection is done.
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("AnalyzeActivity", "onActivityResult");
+        switch (requestCode) {
+            case REQUEST_SELECT_IMAGE:
+                if(resultCode == RESULT_OK) {
+                    // If image is selected successfully, set the image URI and bitmap.
+                    mImageUri = data.getData();
+                    mBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(
+                            mImageUri, getContentResolver());
+                    if (mBitmap != null) {
+                        // Show the image on screen.
+                        mCameraImage.setImageBitmap(mBitmap);
+                        ImageHelper.setImageBitMapToImageView(this, mCameraImage, mCurrentPhotoPath, Constant.REPORT_ROFILE_WIDTH, Constant.REPORT_PROFILE_HEIGHT);
+                        doAnalyze();
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
 //    @Override
 //    public void onActivityResult(int requestCode, int resultCode, Intent data) {
 //        if (resultCode == -1) {
 //            switch (requestCode) {
 //                case REQUEST_TAKE_PHOTO: {
-//                    ImageHelper.saveResizedImage(mContext, mCurrentFileName, mCurrentPhotoPath);
-//                    ImageHelper.setImageBitMapToImageView(mContext, mCameraImage, mCurrentPhotoPath, Constant.REPORT_ROFILE_WIDTH, Constant.REPORT_PROFILE_HEIGHT);
+//                    mImageUri = Uri.parse(mCurrentPhotoPath);
+//                    mBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(
+//                            Uri.parse(mCurrentPhotoPath), getContentResolver());
+//                    if (mBitmap != null) {
+//                        ImageHelper.saveResizedImage(this, mCurrentFileName, mCurrentPhotoPath);
+//                        ImageHelper.setImageBitMapToImageView(this, mCameraImage, mCurrentPhotoPath, Constant.REPORT_ROFILE_WIDTH, Constant.REPORT_PROFILE_HEIGHT);
+//                        doAnalyze();
+//                    }
 //                    break;
 //                }
 //                case REQUEST_PICK_PHOTO: {
 //                    Uri photoUri = data.getData();
-//                    mCurrentPhotoPath = ImageHelper.getPicturePathFromGalleryUri(mContext, photoUri);
-//                    ImageHelper.setImageBitMapToImageView(mContext, mCameraImage, mCurrentPhotoPath, Constant.REPORT_ROFILE_WIDTH, Constant.REPORT_PROFILE_HEIGHT);
+//                    mCurrentPhotoPath = ImageHelper.getPicturePathFromGalleryUri(this, photoUri);
+//                    ImageHelper.setImageBitMapToImageView(this, mCameraImage, mCurrentPhotoPath, Constant.REPORT_ROFILE_WIDTH, Constant.REPORT_PROFILE_HEIGHT);
+//                    doAnalyze();
 //                    break;
 //                }
 //            }

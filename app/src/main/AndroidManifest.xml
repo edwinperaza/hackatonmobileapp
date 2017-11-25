@@ -65,5 +65,16 @@
             <!--android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"-->
             <!--android:label="@string/app_name"-->
             <!--android:theme="@android:style/Theme.Translucent.NoTitleBar"/>-->
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="cl.moriahdp.tarbaychile.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
     </application>
 </manifest>
