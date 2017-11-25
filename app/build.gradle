@@ -39,6 +39,8 @@ dependencies {
     //compile 'com.facebook.android:facebook-android-sdk:4.20.0'
 
     compile 'com.microsoft.projectoxford:vision:1.0.393'
+    //LOTTIE, animacion
+    compile 'com.airbnb.android:lottie:2.0.0-rc1'
 
     //Network
     compile 'com.android.volley:volley:1.0.0'

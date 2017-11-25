@@ -37,6 +37,7 @@ public class ProductsListFragment extends Fragment {
     private ArrayList<Product> mProductsArrayList;
     private Context mContext;
     private onItemSelectedListener mListener;
+    private View mLoadingOverlay;
 
     public ProductsListFragment() {
 
@@ -79,8 +80,11 @@ public class ProductsListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_products_list, container, false);
 
         mProductsListView = (ListView) view.findViewById(R.id.lvProductsList);
+        mLoadingOverlay = view.findViewById(R.id.pb_base);
+        mLoadingOverlay.setVisibility(View.VISIBLE);
         mProductsListView.setAdapter(mProductsListAdapter);
         populateProducts();
+
 
         mProductsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -111,6 +115,7 @@ public class ProductsListFragment extends Fragment {
                         mProductsListAdapter.insert(newsProducts.get(i), i);
                     }
                 }
+                mLoadingOverlay.setVisibility(View.GONE);
             }
 
             @Override
