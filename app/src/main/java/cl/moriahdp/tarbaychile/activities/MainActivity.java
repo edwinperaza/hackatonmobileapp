@@ -124,7 +124,10 @@ public class MainActivity extends GeneralActivity
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.logOut:
-                showLogOutAlertDialogLogOut();
+//                showLogOutAlertDialogLogOut();
+                Intent intent = new Intent(getApplicationContext(), AnalyzeActivity.class);
+//                intent.putExtra("product", product);
+                startActivity(intent);
                 break;
         }
 
