@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.microsoft.projectoxford.vision.VisionServiceClient;
 import com.microsoft.projectoxford.vision.contract.AnalysisResult;
@@ -28,14 +29,23 @@ import com.microsoft.projectoxford.vision.contract.Caption;
 import com.microsoft.projectoxford.vision.contract.Tag;
 import com.microsoft.projectoxford.vision.rest.VisionServiceException;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import cl.moriahdp.tarbaychile.R;
 import cl.moriahdp.tarbaychile.models.AnalysisImageResult;
+import cl.moriahdp.tarbaychile.models.product.Product;
+import cl.moriahdp.tarbaychile.models.product.ProductRequestManager;
+import cl.moriahdp.tarbaychile.network.AppResponseListener;
+import cl.moriahdp.tarbaychile.network.VolleyManager;
 import cl.moriahdp.tarbaychile.utils.Constant;
 import cl.moriahdp.tarbaychile.utils.ImageHelper;
 import cl.moriahdp.tarbaychile.utils.SelectImageActivity;
@@ -273,12 +283,18 @@ public class AnalyzeActivity extends ActionBarActivity {
                 if (result != null) {
                     if ((result.tags != null) && (result.tags.size() > 0)) {
                         List<Tag> tags = result.tags;
+                        List<Tag> tagsUpdated = new ArrayList<>();
                         mEditText.append("Tags:");
                         for (Tag tag : tags) {
                             if (tag.confidence > 0.90) {
                                 mEditText.append(" " + tag.name + ",");
+
+                                tagsUpdated.add(tag);
+
+
                             }
                         }
+                        getInformationFromServer(tagsUpdated);
                     }
 
                     if ((result.description.captions != null) && (result.description.captions.size() > 0)) {
@@ -294,6 +310,37 @@ public class AnalyzeActivity extends ActionBarActivity {
             }
             mCameraImage.setClickable(true);
         }
+    }
+
+    public void getInformationFromServer(List<Tag> tags){
+
+        AppResponseListener<JSONObject> appResponseListener = new AppResponseListener<JSONObject>(getApplicationContext()){
+
+            @Override
+            public void onResponse(JSONObject response) {
+                JSONObject jsonObject = null;
+                try {
+                    Log.d(TAG, response.toString());
+                    jsonObject = response.getJSONObject("");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void noInternetConnectionError() {
+                super.noInternetConnectionError();
+            }
+
+            @Override
+            public void noInternetError() {
+                super.noInternetError();
+            }
+        };
+
+        //We add the request
+        JsonObjectRequest request = ProductRequestManager.getInformationByTags(appResponseListener, tags.get(0).name);
+        VolleyManager.getInstance(this).addToRequestQueue(request);
     }
 
     public static boolean checkPermission(Context context) {

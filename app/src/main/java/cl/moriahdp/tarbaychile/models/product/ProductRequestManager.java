@@ -3,6 +3,7 @@ package cl.moriahdp.tarbaychile.models.product;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import cl.moriahdp.tarbaychile.network.AppRequestManager;
@@ -27,5 +28,18 @@ public class ProductRequestManager extends AppRequestManager {
 
         return new JsonObjectRequest(Request.Method.GET, PRODUCT_LIST_API, params, responseListener,
                                      responseListener);
+    }
+
+    public static JsonObjectRequest getInformationByTags(AppResponseListener<JSONObject> responseListener, String tags) {
+
+        JSONObject params = new JSONObject();
+        try {
+            params.put("tags", tags);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return new JsonObjectRequest(Request.Method.POST, PRODUCT_LIST_API, params, responseListener,
+                responseListener);
     }
 }

@@ -100,7 +100,6 @@ public class ProductsListFragment extends Fragment {
             public void onResponse(JSONObject response) {
                 JSONArray jsonArrayProducts = null;
                 try {
-//                    jsonArrayProducts = response.getJSONArray();
                     jsonArrayProducts = response.getJSONArray("lista");
                 } catch (JSONException e) {
                     e.printStackTrace();
