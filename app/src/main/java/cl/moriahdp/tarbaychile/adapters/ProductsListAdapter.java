@@ -61,7 +61,7 @@ public class ProductsListAdapter extends ArrayAdapter<Product> {
             if (product.getUrlMainImage() != null) {
                 String img = product.getUrlMainImage().trim();
                 if (!img.equals("")) {
-                    Picasso.with(view.getContext()).load(img).placeholder(R.drawable.tarbay).fit().into(mProductMainImageView);
+                    Picasso.with(view.getContext()).load(img).placeholder(R.drawable.falabellachile).fit().into(mProductMainImageView);
                 }
             }
         }
