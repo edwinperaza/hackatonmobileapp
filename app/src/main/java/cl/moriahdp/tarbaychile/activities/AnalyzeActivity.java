@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
@@ -71,6 +72,8 @@ public class AnalyzeActivity extends ActionBarActivity {
     // The edit to show status and result.
     private EditText mEditText;
 
+    private EditText tvName;
+
     private VisionServiceClient client;
 
     public static final int REQUEST_TAKE_PHOTO = 1;
@@ -95,6 +98,7 @@ public class AnalyzeActivity extends ActionBarActivity {
         }
 
         mEditText = (EditText) findViewById(R.id.editTextResult);
+        tvName = (EditText) findViewById(R.id.tv_name);
         mEditText.setVisibility(View.GONE);
         mCameraImage = (ImageView) findViewById(R.id.selectedImage);
         if (checkPermission(getApplicationContext())) {
@@ -300,8 +304,9 @@ public class AnalyzeActivity extends ActionBarActivity {
 
                     if ((result.description.captions != null) && (result.description.captions.size() > 0)) {
                         for (Caption caption : result.description.captions) {
-                            if (caption.confidence > 0.90) {
+                            if (caption.confidence > 0.50) {
                                 //mEditText.append("\\nDescription:" + caption.text);
+                                tvName.setText(caption.text);
                                 break;
                             }
                         }
