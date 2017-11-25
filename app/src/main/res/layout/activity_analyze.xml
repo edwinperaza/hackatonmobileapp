@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -66,6 +67,46 @@
                         android:visibility="visible" />
 
                 </LinearLayout>
+
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/sc2_cl_region_container_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="@+id/sc2_view_separator_region_title_bottom2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/sc2_cl_container_header">
+
+                    <TextView
+                        android:id="@+id/sc2_ctv_spinner_region_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="start"
+                        android:text="Categoría"
+                        android:textColor="@color/bb_darkBackgroundColor"
+                        android:textSize="14sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <Spinner
+                        android:id="@+id/sc2_sp_region"
+                        style="@style/SpinnerCustomTheme"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_marginTop="4dp"
+                        android:gravity="start"
+                        android:paddingEnd="0dp"
+                        android:paddingStart="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/sc2_ctv_spinner_region_title" />
+
+                </android.support.constraint.ConstraintLayout>
 
             </LinearLayout>
         </ScrollView>
