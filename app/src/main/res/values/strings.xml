@@ -15,7 +15,7 @@
     <string name="subscription_key">6bb353dd9d9644188d5ec27fe3fbedaf</string>
     <!-- Select image activity -->
     <string name="select_an_image">Select an Image</string>
-    <string name="take_photo">Take a Photo</string>
-    <string name="select_image_in_album">From Gallery</string>
+    <string name="take_photo">Toma una Foto</string>
+    <string name="select_image_in_album">Desde Galeria</string>
 
 </resources>

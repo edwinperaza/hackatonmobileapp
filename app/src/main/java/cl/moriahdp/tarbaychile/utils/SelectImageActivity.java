@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -106,7 +108,8 @@ public class SelectImageActivity extends ActionBarActivity {
                     startActivityForResult(intent, REQUEST_TAKE_PHOTO);
                 }
             } catch (IOException e) {
-                setInfo(e.getMessage());
+                Log.e("Error", "Select Image Activity");
+                //TODO Send error message
             }
         }
     }
@@ -120,9 +123,4 @@ public class SelectImageActivity extends ActionBarActivity {
         }
     }
 
-    // Set the information panel on screen.
-    private void setInfo(String info) {
-        TextView textView = (TextView) findViewById(R.id.info);
-        textView.setText(info);
-    }
 }

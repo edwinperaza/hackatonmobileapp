@@ -60,7 +60,7 @@ public class MainActivity extends GeneralActivity
             // Set the Background Color of the BottomBar (Also) the application
             mBottomBar.setBackgroundColor(Color.WHITE);
             // Set the Color for the Active Tab of the BottomBar
-            mBottomBar.setActiveTabColor(ContextCompat.getColor(context, R.color.login_button));
+            mBottomBar.setActiveTabColor(ContextCompat.getColor(context, R.color.plp_add_to_cart_button));
 
             mBottomBar.setOnMenuTabClickListener(new OnMenuTabClickListener() {
                 @Override
