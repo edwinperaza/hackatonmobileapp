@@ -15,6 +15,8 @@ import cl.moriahdp.tarbaychile.network.AppResponseListener;
 public class ProductRequestManager extends AppRequestManager {
 
     public static final String PRODUCT_LIST_API = BASE_URL + "products/list/1";
+    public static final String PRODUCT_DETAIL = BASE_URL + "product/";
+    public static final String PRODUCT_SUGGESTIONS = BASE_URL + "/verifyByImage";
 
     /**
      * Creates a new JsonObjectRequest for get a list of stories
@@ -39,7 +41,16 @@ public class ProductRequestManager extends AppRequestManager {
             e.printStackTrace();
         }
 
-        return new JsonObjectRequest(Request.Method.POST, PRODUCT_LIST_API, params, responseListener,
+        return new JsonObjectRequest(Request.Method.POST, PRODUCT_SUGGESTIONS, params, responseListener,
+                responseListener);
+    }
+
+    public static JsonObjectRequest getProductDetail(AppResponseListener<JSONObject> responseListener, String productId) {
+
+        JSONObject params = new JSONObject();
+        String url = PRODUCT_DETAIL + productId;
+
+        return new JsonObjectRequest(Request.Method.GET, url, params, responseListener,
                 responseListener);
     }
 }
