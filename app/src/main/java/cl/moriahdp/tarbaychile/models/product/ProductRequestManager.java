@@ -19,6 +19,7 @@ import cl.moriahdp.tarbaychile.network.AppResponseListener;
 public class ProductRequestManager extends AppRequestManager {
 
     public static final String PRODUCT_LIST_API = BASE_URL + "products/list/1";
+    public static final String STOCK_LIST_API = BASE_URL + "stock/1";
     public static final String PRODUCT_DETAIL = BASE_URL + "product/";
     public static final String PRODUCT_SUGGESTIONS = BASE_URL + "verifyByImage";
 
@@ -33,6 +34,14 @@ public class ProductRequestManager extends AppRequestManager {
         JSONObject params = new JSONObject();
 
         return new JsonObjectRequest(Request.Method.GET, PRODUCT_LIST_API, params, responseListener,
+                                     responseListener);
+    }
+
+    public static JsonObjectRequest getStockList(AppResponseListener<JSONObject> responseListener) {
+
+        JSONObject params = new JSONObject();
+
+        return new JsonObjectRequest(Request.Method.GET, STOCK_LIST_API, params, responseListener,
                                      responseListener);
     }
 

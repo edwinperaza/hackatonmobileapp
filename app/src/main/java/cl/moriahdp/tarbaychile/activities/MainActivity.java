@@ -24,11 +24,13 @@ import cl.moriahdp.tarbaychile.fragments.NotificationListFragment;
 import cl.moriahdp.tarbaychile.fragments.ProductsListFragment;
 import cl.moriahdp.tarbaychile.fragments.ProfileFragment;
 import cl.moriahdp.tarbaychile.models.product.Product;
+import cl.moriahdp.tarbaychile.models.product.StockNotification;
 import cl.moriahdp.tarbaychile.utils.PreferencesManager;
 
 public class MainActivity extends GeneralActivity
         implements ProductsListFragment.onItemSelectedListener,
-        ProfileFragment.onOptionSelectedListener {
+        ProfileFragment.onOptionSelectedListener,
+        NotificationListFragment.onItemSelectedListener {
 
     private BottomBar mBottomBar;
 
@@ -188,5 +190,16 @@ public class MainActivity extends GeneralActivity
             ft.replace(R.id.mainFragment, mProfileFragment);
             ft.commit();
 
+    }
+
+    @Override
+    public void onNotificationItemSelected(StockNotification stockNotification) {
+        if (stockNotification != null) {
+
+//            Intent intent = new Intent(getApplicationContext(), ProductDetailActivity.class);
+//            intent.putExtra("product", product);
+//            startActivity(intent);
+
+        }
     }
 }

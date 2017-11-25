@@ -26,42 +26,34 @@ import java.util.Map;
 import cl.moriahdp.tarbaychile.R;
 import cl.moriahdp.tarbaychile.adapters.CategoriesListExpandableAdapter;
 import cl.moriahdp.tarbaychile.adapters.ProductsListAdapter;
+import cl.moriahdp.tarbaychile.adapters.StockListAdapter;
 import cl.moriahdp.tarbaychile.models.category.Category;
 import cl.moriahdp.tarbaychile.models.product.Product;
 import cl.moriahdp.tarbaychile.models.product.ProductRequestManager;
+import cl.moriahdp.tarbaychile.models.product.StockNotification;
 import cl.moriahdp.tarbaychile.models.subcategory.SubCategory;
 import cl.moriahdp.tarbaychile.network.AppResponseListener;
 import cl.moriahdp.tarbaychile.network.VolleyManager;
 
 public class NotificationListFragment extends Fragment {
 
-    private ArrayList<Category> mCategoriesArrayList;
-    private ListView mCategoriesListView;
-    private ExpandableListAdapter mAdapterView;
-    List<Map<String, String>> mCategoriesListItem = new ArrayList<Map<String, String>>();
-    List<List<Map<String, String>>> mSubCategoriesListItem = new ArrayList<List<Map<String, String>>>();
-
-    private ExpandableListView expandableListView;
-    private int lastExpandedPosition = -1;
-    private List<Category> mCategoryList;
-
     private static final String ARG_TITLE = "TITLE";
     private ListView mProductsListView;
-    private ProductsListAdapter mProductsListAdapter;
-    private ArrayList<Product> mProductsArrayList;
+    private StockListAdapter mstockListAdapter;
+    private ArrayList<StockNotification> mProductsArrayList;
     private Context mContext;
-    private ProductsListFragment.onItemSelectedListener mListener;
+    private NotificationListFragment.onItemSelectedListener mListener;
     private View mLoadingOverlay;
 
     public NotificationListFragment() {
     }
 
     public interface onItemSelectedListener {
-        void onProductItemSelected(Product product);
+        void onNotificationItemSelected(StockNotification stockNotification);
     }
 
-    public static ProductsListFragment newInstance(String title) {
-        ProductsListFragment fragment = new ProductsListFragment();
+    public static NotificationListFragment newInstance(String title) {
+        NotificationListFragment fragment = new NotificationListFragment();
         Bundle args = new Bundle();
         args.putString(ARG_TITLE, title);
         fragment.setArguments(args);
@@ -72,15 +64,15 @@ public class NotificationListFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mProductsArrayList = new ArrayList<>();
-        mProductsListAdapter = new ProductsListAdapter(getActivity(), mProductsArrayList);
+        mstockListAdapter = new StockListAdapter(getActivity(), mProductsArrayList);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
-        if (context instanceof ProductsListFragment.onItemSelectedListener) {
-            mListener = (ProductsListFragment.onItemSelectedListener) context;
+        if (context instanceof NotificationListFragment.onItemSelectedListener) {
+            mListener = (NotificationListFragment.onItemSelectedListener) context;
         } else {
             throw new ClassCastException(context.toString()
                     + " must implement ProductsListFragment.OnItemSelectedListener");
@@ -95,15 +87,15 @@ public class NotificationListFragment extends Fragment {
         mProductsListView = (ListView) view.findViewById(R.id.lvProductsList);
         mLoadingOverlay = view.findViewById(R.id.pb_base);
         mLoadingOverlay.setVisibility(View.VISIBLE);
-        mProductsListView.setAdapter(mProductsListAdapter);
+        mProductsListView.setAdapter(mstockListAdapter);
         populateProducts();
 
 
         mProductsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Product product = (Product) parent.getItemAtPosition(position);
-                mListener.onProductItemSelected(product);
+                StockNotification stockNotification = (StockNotification) parent.getItemAtPosition(position);
+                mListener.onNotificationItemSelected(stockNotification);
             }
         });
         return view;
@@ -121,11 +113,11 @@ public class NotificationListFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                List<Product> newsProducts = Product.fromJsonArray(jsonArrayProducts);
+                List<StockNotification> stockNotificationList = StockNotification.fromJsonArray(jsonArrayProducts);
 
-                if (!newsProducts.isEmpty()) {
-                    for (int i = 0; i < newsProducts.size(); i++) {
-                        mProductsListAdapter.insert(newsProducts.get(i), i);
+                if (!stockNotificationList.isEmpty()) {
+                    for (int i = 0; i < stockNotificationList.size(); i++) {
+                        mstockListAdapter.insert(stockNotificationList.get(i), i);
                     }
                 }
                 mLoadingOverlay.setVisibility(View.GONE);
@@ -143,7 +135,7 @@ public class NotificationListFragment extends Fragment {
         };
 
         //We add the request
-        JsonObjectRequest request = ProductRequestManager.getProductsList(appResponseListener);
+        JsonObjectRequest request = ProductRequestManager.getStockList(appResponseListener);
         VolleyManager.getInstance(getContext()).addToRequestQueue(request);
     }
 }

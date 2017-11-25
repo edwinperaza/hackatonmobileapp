@@ -1,0 +1,72 @@
+package cl.moriahdp.tarbaychile.adapters;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
+import java.util.List;
+
+import cl.moriahdp.tarbaychile.R;
+import cl.moriahdp.tarbaychile.models.product.Product;
+import cl.moriahdp.tarbaychile.models.product.StockNotification;
+
+/**
+ * Created by edwinmperazaduran on 7/31/16.
+ */
+public class StockListAdapter extends ArrayAdapter<StockNotification> {
+
+    List<StockNotification> mProductsList;
+
+    public StockListAdapter(Context context, List<StockNotification> objects) {
+        super(context, 0, objects);
+        mProductsList = objects;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        StockNotification stockNotification = mProductsList.get(position);
+        ViewHolder viewHolder;
+        if (convertView == null) {
+
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_products_item, parent, false);
+
+            viewHolder = new ViewHolder(convertView);
+            convertView.setTag(viewHolder);
+
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+
+        viewHolder.setProduct(convertView, stockNotification);
+        return convertView;
+    }
+
+    private static class ViewHolder {
+        ImageView mProductMainImageView;
+        TextView mProductTitleView;
+
+        public ViewHolder(View view){
+            mProductMainImageView = (ImageView) view.findViewById(R.id.ivMainImageProductList);
+            mProductTitleView = (TextView) view.findViewById(R.id.tvTitleProductList);
+
+        }
+
+        public void setProduct(View view, StockNotification stockNotification){
+            this.mProductTitleView.setText(stockNotification.analisis);
+//
+//            if (product.getUrlMainImage() != null) {
+//                String img = product.getUrlMainImage().trim();
+//                if (!img.equals("")) {
+//                    Picasso.with(view.getContext()).load(img).placeholder(R.drawable.falabellachile).fit().into(mProductMainImageView);
+//                }
+//            }
+        }
+
+    }
+}
