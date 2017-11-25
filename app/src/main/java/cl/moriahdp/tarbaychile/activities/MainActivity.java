@@ -20,6 +20,7 @@ import cl.moriahdp.tarbaychile.R;
 import cl.moriahdp.tarbaychile.fragments.CameraFragment;
 import cl.moriahdp.tarbaychile.fragments.CategoriesListFragment;
 import cl.moriahdp.tarbaychile.fragments.ContactUsFragment;
+import cl.moriahdp.tarbaychile.fragments.NotificationListFragment;
 import cl.moriahdp.tarbaychile.fragments.ProductsListFragment;
 import cl.moriahdp.tarbaychile.fragments.ProfileFragment;
 import cl.moriahdp.tarbaychile.models.product.Product;
@@ -160,7 +161,8 @@ public class MainActivity extends GeneralActivity
     }
 
     public void ShowCategoriesListFragment(){
-        Fragment mCategoriesListFragment = CategoriesListFragment.newInstance();
+//        Fragment mCategoriesListFragment = CategoriesListFragment.newInstance();
+        Fragment mCategoriesListFragment = NotificationListFragment.newInstance("Avisos");
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.mainFragment, mCategoriesListFragment);
         ft.commit();
