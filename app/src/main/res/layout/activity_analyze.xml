@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="#E0E0E0" >
+    android:background="@color/white" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,7 +39,6 @@
                     android:layout_height="300dp"
                     android:layout_toEndOf="@+id/image_control"
                     android:layout_toRightOf="@+id/image_control"
-                    android:background="#E0E0E0"
                     android:scaleType="centerCrop" />
 
                 <LinearLayout
@@ -96,7 +95,7 @@
                         android:id="@+id/sc2_sp_region"
                         style="@style/SpinnerCustomTheme"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="50dp"
                         android:layout_marginTop="4dp"
                         android:gravity="start"
                         android:paddingEnd="0dp"
@@ -105,6 +104,46 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/sc2_ctv_spinner_region_title" />
+
+                </android.support.constraint.ConstraintLayout>
+
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/sc2_cl_price_container_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="@+id/sc2_view_separator_region_title_bottom2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/sc2_cl_container_header">
+
+                    <TextView
+                        android:id="@+id/sc2_ctv_spinner_price_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="start"
+                        android:text="Rango de precio sugerido"
+                        android:textColor="@color/bb_darkBackgroundColor"
+                        android:textSize="14sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <Spinner
+                        android:id="@+id/sc2_sp_prices"
+                        style="@style/SpinnerCustomTheme"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="4dp"
+                        android:gravity="start"
+                        android:paddingEnd="0dp"
+                        android:paddingStart="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/sc2_ctv_spinner_price_title" />
 
                 </android.support.constraint.ConstraintLayout>
 

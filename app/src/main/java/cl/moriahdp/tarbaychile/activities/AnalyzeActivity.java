@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -14,12 +15,17 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -81,7 +87,8 @@ public class AnalyzeActivity extends ActionBarActivity {
 
     public ImageView mCameraImage;
     public Context mContext;
-
+    private Spinner mSpRegions;
+    private Spinner mSpPrices;
     private String mCurrentPhotoPath;
     private String mCurrentFileName;
     private View mRootView;
@@ -100,6 +107,8 @@ public class AnalyzeActivity extends ActionBarActivity {
         mEditText = (EditText) findViewById(R.id.editTextResult);
         tvName = (EditText) findViewById(R.id.tv_name);
         mEditText.setVisibility(View.GONE);
+        mSpRegions = (Spinner) findViewById(R.id.sc2_sp_region);
+        mSpPrices = (Spinner) findViewById(R.id.sc2_sp_prices);
         mCameraImage = (ImageView) findViewById(R.id.selectedImage);
         if (checkPermission(getApplicationContext())) {
             selectImage();
@@ -334,6 +343,8 @@ public class AnalyzeActivity extends ActionBarActivity {
                     List<CategorySuggestion> categorySuggestionList = CategorySuggestion.fromJsonArray(jsonArrayCategories);
                     List<PriceSuggestions> priceSuggestionsList = PriceSuggestions.fromJsonArray(jsonArrayPrices);
 
+                    showCategories(categorySuggestionList);
+                    showPriceSuggestions(priceSuggestionsList);
                     Log.d(TAG, "End of parse");
 
                 } catch (JSONException e) {
@@ -356,6 +367,115 @@ public class AnalyzeActivity extends ActionBarActivity {
         JsonObjectRequest request = ProductRequestManager.getInformationByTags(appResponseListener, tags);
         VolleyManager.getInstance(this).addToRequestQueue(request);
     }
+
+    public void showCategories(List<CategorySuggestion> categorySuggestionList) {
+        List<String> categories = new ArrayList<>();
+        categories.add("Selecciona una opción");
+        int max = 0;
+        int pos = 1;
+        int counter = 1;
+        for (CategorySuggestion cs: categorySuggestionList) {
+            if ((cs.label != null) && (!cs.label.isEmpty()) && (!cs.label.trim().equals(""))) {
+                categories.add(cs.label);
+                if (cs.count > max) {
+                    max = cs.count;
+                    pos = counter;
+                }
+                counter++;
+            }
+        }
+
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categories) {
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View v = super.getView(position, convertView, parent);
+                (v).setPadding(0, 0, 0, 0);
+                return v;
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View v = super.getDropDownView(position, convertView, parent);
+                return v;
+            }
+        };
+        mSpRegions.setAdapter(arrayAdapter);
+//        mClRegions.setVisibility(View.VISIBLE);
+
+        mSpRegions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                ((TextView) view).setTextColor(Color.BLACK);
+            }
+
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        if (pos < categorySuggestionList.size()) {
+            mSpRegions.setSelection(pos);
+        }
+
+    }
+
+    public void showPriceSuggestions(List<PriceSuggestions> priceSuggestions) {
+        List<String> categories = new ArrayList<>();
+        categories.add("Selecciona una opción");
+        int max = 0;
+        int pos = 1;
+        int counter = 1;
+        for (PriceSuggestions cs: priceSuggestions) {
+            if ((cs.label != null) && (!cs.label.isEmpty()) && (!cs.label.trim().equals(""))) {
+                categories.add(cs.label);
+                if (cs.count > max) {
+                    max = cs.count;
+                    pos = counter;
+                }
+                counter++;
+            }
+        }
+
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categories) {
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View v = super.getView(position, convertView, parent);
+                (v).setPadding(0, 0, 0, 0);
+                return v;
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View v = super.getDropDownView(position, convertView, parent);
+                return v;
+            }
+        };
+        mSpPrices.setAdapter(arrayAdapter);
+//        mClRegions.setVisibility(View.VISIBLE);
+
+        mSpPrices.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                ((TextView) view).setTextColor(Color.BLACK);
+            }
+
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        if (pos < priceSuggestions.size()) {
+            mSpPrices.setSelection(pos);
+        }
+
+    }
+
 
     public static boolean checkPermission(Context context) {
         int result = ContextCompat.checkSelfPermission(context,

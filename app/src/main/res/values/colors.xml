@@ -7,8 +7,8 @@
 
     <color name="primary">#212121</color>
     <color name="primary_dark">#222222</color>
-    <color name="login_button">#FFC107</color>
-    <color name="login_control_activated">#FFECB3</color>
+    <color name="login_button">#0f740f</color>
+    <color name="login_control_activated">#a4c735</color>
     <color name="accent">#FFFFFF</color>
 
     <color name="black">#000000</color>

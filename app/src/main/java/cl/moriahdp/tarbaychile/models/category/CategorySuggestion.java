@@ -17,7 +17,7 @@ import cl.moriahdp.tarbaychile.models.product.Product;
 public class CategorySuggestion implements Serializable {
 
     public String primaryNav;
-    public String count;
+    public int count;
     public String label;
     public Boolean selected;
     public String url;
@@ -52,7 +52,7 @@ public class CategorySuggestion implements Serializable {
         try {
 
             categorySuggestion.primaryNav = jsonObjectProduct.getString("primaryNav");
-            categorySuggestion.count = jsonObjectProduct.getString("count");
+            categorySuggestion.count = jsonObjectProduct.getInt("count");
             categorySuggestion.label = jsonObjectProduct.getString("label");
             categorySuggestion.selected = jsonObjectProduct.getBoolean("selected");
             categorySuggestion.url = jsonObjectProduct.getString("url");
