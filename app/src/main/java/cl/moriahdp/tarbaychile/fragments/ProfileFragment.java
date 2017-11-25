@@ -70,7 +70,7 @@ public class ProfileFragment extends Fragment {
         mContactUs = (TextView) view.findViewById(R.id.tv_contact_us);
         mAddFriend = (ImageView) view.findViewById(R.id.iv_add_friend);
 
-        Uri uri = Uri.parse("http://www.tarbay.com/media/wysiwyg/logo-tarbay-header.png");
+        Uri uri = Uri.parse("http://evento.juridia.co/wp-content/uploads/2016/05/client2.png");
         mProfileImageView.setImageURI(uri);
         mProfileImageView.setOnClickListener(new View.OnClickListener() {
             @Override

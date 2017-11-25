@@ -88,7 +88,7 @@ public class NotificationListFragment extends Fragment {
         mLoadingOverlay = view.findViewById(R.id.pb_base);
         mLoadingOverlay.setVisibility(View.VISIBLE);
         mProductsListView.setAdapter(mstockListAdapter);
-        populateProducts();
+        populateNotifications();
 
 
         mProductsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -101,7 +101,7 @@ public class NotificationListFragment extends Fragment {
         return view;
     }
 
-    public void populateProducts(){
+    public void populateNotifications(){
         AppResponseListener<JSONObject> appResponseListener = new AppResponseListener<JSONObject>(
                 getActivity().getApplicationContext()){
 

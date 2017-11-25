@@ -28,8 +28,7 @@
                 android:paddingTop="16dp"
                 fresco:actualImageScaleType="centerInside"
                 fresco:placeholderImage="@color/colorPrimary"
-                fresco:roundAsCircle="true">
-            </com.facebook.drawee.view.SimpleDraweeView>
+                fresco:roundAsCircle="true"></com.facebook.drawee.view.SimpleDraweeView>
 
             <ImageView
                 android:id="@+id/iv_add_friend"
@@ -54,10 +53,10 @@
                 android:id="@+id/user_profile_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/sdv_profile_image"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="16dp"
-                android:layout_below="@+id/sdv_profile_image"
-                android:text="Beatriz Gonzalez"
+                android:text="Edwin Peraza"
                 android:textColor="@color/black"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -69,7 +68,7 @@
                 android:layout_below="@+id/user_profile_name"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="12dp"
-                android:text="Me encanta Tarbay"
+                android:text="Falabella MarketPlace"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
         </RelativeLayout>

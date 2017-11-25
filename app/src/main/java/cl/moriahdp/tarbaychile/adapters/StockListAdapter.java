@@ -34,7 +34,7 @@ public class StockListAdapter extends ArrayAdapter<StockNotification> {
         ViewHolder viewHolder;
         if (convertView == null) {
 
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_products_item, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_notification_item, parent, false);
 
             viewHolder = new ViewHolder(convertView);
             convertView.setTag(viewHolder);
@@ -50,15 +50,21 @@ public class StockListAdapter extends ArrayAdapter<StockNotification> {
     private static class ViewHolder {
         ImageView mProductMainImageView;
         TextView mProductTitleView;
+        TextView mProductCodeView;
+        TextView mProductPromQtyView;
 
         public ViewHolder(View view){
-            mProductMainImageView = (ImageView) view.findViewById(R.id.ivMainImageProductList);
+//            mProductMainImageView = (ImageView) view.findViewById(R.id.ivMainImageProductList);
             mProductTitleView = (TextView) view.findViewById(R.id.tvTitleProductList);
+            mProductCodeView = (TextView) view.findViewById(R.id.tv_code);
+            mProductPromQtyView = (TextView) view.findViewById(R.id.tv_prom_qty);
 
         }
 
         public void setProduct(View view, StockNotification stockNotification){
             this.mProductTitleView.setText(stockNotification.analisis);
+            this.mProductCodeView.setText(stockNotification.producto);
+            this.mProductPromQtyView.setText(String.valueOf(stockNotification.prm_stock));
 //
 //            if (product.getUrlMainImage() != null) {
 //                String img = product.getUrlMainImage().trim();
