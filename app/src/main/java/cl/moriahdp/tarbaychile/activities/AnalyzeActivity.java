@@ -42,6 +42,9 @@ import java.util.List;
 
 import cl.moriahdp.tarbaychile.R;
 import cl.moriahdp.tarbaychile.models.AnalysisImageResult;
+import cl.moriahdp.tarbaychile.models.PriceSuggestions;
+import cl.moriahdp.tarbaychile.models.category.Category;
+import cl.moriahdp.tarbaychile.models.category.CategorySuggestion;
 import cl.moriahdp.tarbaychile.models.product.Product;
 import cl.moriahdp.tarbaychile.models.product.ProductRequestManager;
 import cl.moriahdp.tarbaychile.network.AppResponseListener;
@@ -92,6 +95,7 @@ public class AnalyzeActivity extends ActionBarActivity {
         }
 
         mEditText = (EditText) findViewById(R.id.editTextResult);
+        mEditText.setVisibility(View.GONE);
         mCameraImage = (ImageView) findViewById(R.id.selectedImage);
         if (checkPermission(getApplicationContext())) {
             selectImage();
@@ -284,14 +288,11 @@ public class AnalyzeActivity extends ActionBarActivity {
                     if ((result.tags != null) && (result.tags.size() > 0)) {
                         List<Tag> tags = result.tags;
                         List<Tag> tagsUpdated = new ArrayList<>();
-                        mEditText.append("Tags:");
+                        //mEditText.append("Tags:");
                         for (Tag tag : tags) {
-                            if (tag.confidence > 0.90) {
-                                mEditText.append(" " + tag.name + ",");
-
+                            if (tag.confidence > 0.50) {
+                                //mEditText.append(" " + tag.name + ",");
                                 tagsUpdated.add(tag);
-
-
                             }
                         }
                         getInformationFromServer(tagsUpdated);
@@ -300,7 +301,7 @@ public class AnalyzeActivity extends ActionBarActivity {
                     if ((result.description.captions != null) && (result.description.captions.size() > 0)) {
                         for (Caption caption : result.description.captions) {
                             if (caption.confidence > 0.90) {
-                                mEditText.append("\\nDescription:" + caption.text);
+                                //mEditText.append("\\nDescription:" + caption.text);
                                 break;
                             }
                         }
@@ -318,10 +319,18 @@ public class AnalyzeActivity extends ActionBarActivity {
 
             @Override
             public void onResponse(JSONObject response) {
-                JSONObject jsonObject = null;
+                JSONArray jsonArrayCategories = null;
+                JSONArray jsonArrayPrices = null;
                 try {
                     Log.d(TAG, response.toString());
-                    jsonObject = response.getJSONObject("");
+                    jsonArrayCategories = response.getJSONArray("categories");
+                    jsonArrayPrices = response.getJSONArray("prices");
+
+                    List<CategorySuggestion> categorySuggestionList = CategorySuggestion.fromJsonArray(jsonArrayCategories);
+                    List<PriceSuggestions> priceSuggestionsList = PriceSuggestions.fromJsonArray(jsonArrayPrices);
+
+                    Log.d(TAG, "End of parse");
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -339,7 +348,7 @@ public class AnalyzeActivity extends ActionBarActivity {
         };
 
         //We add the request
-        JsonObjectRequest request = ProductRequestManager.getInformationByTags(appResponseListener, tags.get(0).name);
+        JsonObjectRequest request = ProductRequestManager.getInformationByTags(appResponseListener, tags);
         VolleyManager.getInstance(this).addToRequestQueue(request);
     }
 
