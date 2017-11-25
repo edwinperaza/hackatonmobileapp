@@ -10,7 +10,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBarActivity;
@@ -25,6 +27,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -91,6 +94,7 @@ public class AnalyzeActivity extends ActionBarActivity {
     private Spinner mSpPrices;
     private String mCurrentPhotoPath;
     private String mCurrentFileName;
+    private RelativeLayout mButtonSave;
     private View mRootView;
     private static final String TAG = AnalyzeActivity.class.getSimpleName();
 
@@ -110,6 +114,7 @@ public class AnalyzeActivity extends ActionBarActivity {
         mSpRegions = (Spinner) findViewById(R.id.sc2_sp_region);
         mSpPrices = (Spinner) findViewById(R.id.sc2_sp_prices);
         mCameraImage = (ImageView) findViewById(R.id.selectedImage);
+        mButtonSave = (RelativeLayout) findViewById(R.id.rl_button_save);
         if (checkPermission(getApplicationContext())) {
             selectImage();
         } else {
@@ -142,7 +147,25 @@ public class AnalyzeActivity extends ActionBarActivity {
                 }
             }
         });
+
+        mButtonSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Snackbar.make(v, "Almacenado Satisfactoriamente", Snackbar.LENGTH_LONG).show();
+                mRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        finish();
+                    }
+                };
+                mHandler.postDelayed(mRunnable, 2000);
+
+            }
+        });
     }
+
+    private Handler mHandler = new Handler();
+    private Runnable mRunnable;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
